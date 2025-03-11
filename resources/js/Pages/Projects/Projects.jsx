@@ -1,10 +1,11 @@
 import React from 'react';
 import { Head } from '@inertiajs/inertia-react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import ProjectsList from '@/Components/Projects/ProjectsList';
+import ProjectsList from '@/Components/ProjectsList';
 import { Link } from '@inertiajs/inertia-react';
 
-export default function Projects({ auth, projects, flash }) {
+
+export default function Projects({ auth, ownedProjects, collaborativeProjects, flash }) {
     return (
         <AuthenticatedLayout
             auth={auth}
@@ -23,7 +24,7 @@ export default function Projects({ auth, projects, flash }) {
                             )}
 
                             <div className="flex justify-between items-center mb-6">
-                                <h1 className="text-2xl font-bold">Liste des projets</h1>
+                                <h1 className="text-2xl font-bold">Mes projets</h1>
                                 <Link
                                     href={route('projects.create')}
                                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
@@ -32,7 +33,15 @@ export default function Projects({ auth, projects, flash }) {
                                 </Link>
                             </div>
 
-                            <ProjectsList projects={projects} />
+                            <h2 className="text-xl font-semibold mb-2">Mes projets</h2>
+                            <ProjectsList projects={ownedProjects} isOwner={true} />
+
+                            {collaborativeProjects.length > 0 && (
+                                <>
+                                    <h2 className="text-xl font-semibold mt-8 mb-2">Projets collaboratifs</h2>
+                                    <ProjectsList projects={collaborativeProjects} isOwner={false} />
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

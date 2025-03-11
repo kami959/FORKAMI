@@ -9,27 +9,11 @@ use Illuminate\Auth\Access\Response;
 class ProjectPolicy
 {
     /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
-    {
-        return false;
-    }
-
-    /**
      * Determine whether the user can view the model.
      */
     public function view(User $user, Project $project): bool
     {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
-    {
-        return false;
+        return $project->hasAccess($user);
     }
 
     /**
@@ -37,7 +21,7 @@ class ProjectPolicy
      */
     public function update(User $user, Project $project): bool
     {
-        return false;
+        return $project->hasAccess($user);
     }
 
     /**
@@ -45,22 +29,16 @@ class ProjectPolicy
      */
     public function delete(User $user, Project $project): bool
     {
-        return false;
+        // Seul le propriétaire peut supprimer un projet
+        return $user->id === $project->user_id;
     }
 
     /**
-     * Determine whether the user can restore the model.
+     * Determine whether the user can manage collaborators.
      */
-    public function restore(User $user, Project $project): bool
+    public function manageCollaborators(User $user, Project $project): bool
     {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Project $project): bool
-    {
-        return false;
+        // Seul le propriétaire peut gérer les collaborateurs
+        return $user->id === $project->user_id;
     }
 }

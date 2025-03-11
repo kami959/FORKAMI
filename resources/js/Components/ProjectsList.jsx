@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from '@inertiajs/inertia-react';
 import { Inertia } from '@inertiajs/inertia';
 
-export default function ProjectsList({ projects }) {
+export default function ProjectsList({ projects, isOwner }) {
     const handleDelete = (id) => {
         if (confirm('Êtes-vous sûr de vouloir supprimer ce projet?')) {
             Inertia.delete(route('projects.destroy', id));
@@ -13,7 +13,7 @@ export default function ProjectsList({ projects }) {
         <div>
             {projects.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
-                    Aucun projet trouvé. Créez votre premier projet!
+                    Aucun projet trouvé. {isOwner ? "Créez votre premier projet!" : ""}
                 </div>
             ) : (
                 <div className="overflow-x-auto">
@@ -52,17 +52,33 @@ export default function ProjectsList({ projects }) {
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <Link
-                                            href={route('projects.edit', project.id)}
-                                            className="text-indigo-600 hover:text-indigo-900 mr-4"
+                                            href={route('tasks.index', project.id)}
+                                            className="text-green-600 hover:text-green-900 mr-4"
                                         >
-                                            Modifier
+                                            Voir les tâches
                                         </Link>
-                                        <button
-                                            onClick={() => handleDelete(project.id)}
-                                            className="text-red-600 hover:text-red-900"
+                                        <Link
+                                            href={route('projects.collaborators.index', project.id)}
+                                            className="text-purple-600 hover:text-purple-900 mr-4"
                                         >
-                                            Supprimer
-                                        </button>
+                                            Collaborateurs
+                                        </Link>
+                                        {isOwner && (
+                                            <>
+                                                <Link
+                                                    href={route('projects.edit', project.id)}
+                                                    className="text-indigo-600 hover:text-indigo-900 mr-4"
+                                                >
+                                                    Modifier
+                                                </Link>
+                                                <button
+                                                    onClick={() => handleDelete(project.id)}
+                                                    className="text-red-600 hover:text-red-900"
+                                                >
+                                                    Supprimer
+                                                </button>
+                                            </>
+                                        )}
                                     </td>
                                 </tr>
                             ))}

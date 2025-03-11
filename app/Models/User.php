@@ -2,20 +2,19 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $fillable = [
         'name',
@@ -26,7 +25,7 @@ class User extends Authenticatable
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $hidden = [
         'password',
@@ -34,29 +33,42 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
+
+    /**
+     * Récupérer les projets dont l'utilisateur est propriétaire
+     */
+    public function ownedProjects()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
-    public function projects()
-    {
-        return $this->hasMany(Project::class, 'owner_id');
+        return $this->hasMany(Project::class);
     }
 
-    public function tasks()
+    /**
+     * Récupérer les projets sur lesquels l'utilisateur collabore
+     */
+    public function collaborativeProjects()
     {
-        return $this->hasMany(Task::class);
+        return $this->belongsToMany(Project::class, 'project_user')->withTimestamps();
     }
 
-    public function assignedProjects()
+    /**
+     * Récupérer tous les projets auxquels l'utilisateur a accès
+     * (combinaison des projets possédés et collaboratifs)
+     */
+    public function getAllAccessibleProjects()
     {
-        return $this->belongsToMany(Project::class)->withPivot('role');
+        $ownedProjectIds = $this->ownedProjects()->pluck('id');
+        $collaborativeProjectIds = $this->collaborativeProjects()->pluck('id');
+
+        $allProjectIds = $ownedProjectIds->merge($collaborativeProjectIds);
+
+        return Project::whereIn('id', $allProjectIds)->get();
     }
 }
