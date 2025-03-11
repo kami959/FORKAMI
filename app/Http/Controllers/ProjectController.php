@@ -3,68 +3,93 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
-use App\Http\Requests\StoreProjectRequest;
-use App\Http\Requests\UpdateProjectRequest;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ProjectController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Afficher la liste des projets
      */
     public function index()
     {
-        return Inertia::render('Projects/ProjectList',[
-            'projects' => Project::all()
-        
+        $projects = Project::where('user_id', auth()->id())->latest()->get();
+
+        return Inertia::render('Projects', [
+            'projects' => $projects
         ]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Afficher le formulaire de création
      */
     public function create()
     {
-        //
+        return Inertia::render('Projects/Create');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Enregistrer un nouveau projet
      */
-    public function store(StoreProjectRequest $request)
+    public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        $project = new Project();
+        $project->title = $validated['title'];
+        $project->description = $validated['description'];
+        $project->user_id = auth()->id();
+        $project->save();
+
+        return redirect()->route('projects.index')
+            ->with('message', 'Projet créé avec succès.');
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Project $project)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
+     * Afficher le formulaire d'édition
      */
     public function edit(Project $project)
     {
-        //
+        $this->authorize('update', $project);
+
+        return Inertia::render('Projects/Edit', [
+            'project' => $project
+        ]);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Mettre à jour un projet
      */
-    public function update(UpdateProjectRequest $request, Project $project)
+    public function update(Request $request, Project $project)
     {
-        //
+        $this->authorize('update', $project);
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        $project->title = $validated['title'];
+        $project->description = $validated['description'];
+        $project->save();
+
+        return redirect()->route('projects.index')
+            ->with('message', 'Projet mis à jour avec succès.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Supprimer un projet
      */
     public function destroy(Project $project)
     {
-        //
+        $this->authorize('delete', $project);
+
+        $project->delete();
+
+        return redirect()->route('projects.index')
+            ->with('message', 'Projet supprimé avec succès.');
     }
 }
