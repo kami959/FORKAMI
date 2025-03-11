@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from '@inertiajs/inertia-react';
 import { Inertia } from '@inertiajs/inertia';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+
 
 export default function TasksList({ tasks, projectId }) {
     const handleDelete = (id) => {
@@ -14,6 +16,7 @@ export default function TasksList({ tasks, projectId }) {
     };
 
     return (
+
         <div>
             {tasks.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">

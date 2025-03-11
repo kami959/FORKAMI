@@ -11,9 +11,10 @@ export default function AuthenticatedLayout({ header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
 
     return (
+        <>
+            <Sidebar />
         <div className="flex min-h-screen bg-gray-100">
             {/* Sidebar */}
-            <Sidebar />
 
             <div className="flex-1 flex flex-col">
                 {/* Barre de navigation en haut */}
@@ -83,5 +84,7 @@ export default function AuthenticatedLayout({ header, children }) {
                 <main className="p-6 flex-1">{children}</main>
             </div>
         </div>
+        </>
+
     );
 }

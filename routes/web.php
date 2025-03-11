@@ -6,6 +6,7 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ProjectUserController;
 
 
+
 use App\Models\Project;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -58,4 +59,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/projects/{project}/collaborators', [ProjectUserController::class, 'store'])->name('projects.collaborators.store');
     Route::delete('/projects/{project}/collaborators/{user}', [ProjectUserController::class, 'destroy'])->name('projects.collaborators.destroy');
 });
+
+
+
+
+
+
+
 require __DIR__.'/auth.php';

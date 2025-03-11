@@ -4,6 +4,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 
+
+
 export default function AddCollaborator({ auth, project, availableUsers }) {
     const { data, setData, post, processing, errors } = useForm({
         user_id: '',
